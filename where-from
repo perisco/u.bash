@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# ShVV 2016-01-08 --
+#
+
+if [ -z "$1" ]
+then
+    echo "Usage:"
+    echo "	where-from <ip>"
+    exit 1
+fi
+
+whois $1 | grep -i -e "OrgName:" -e "Address:" -e "StateProv:" -e "Country:"
+
+# EoF

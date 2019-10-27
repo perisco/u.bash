@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# Make a subtree readonly (read-write)
+# ShVV 2017-03-07
+#
+
+me=`basename $0`
+
+if [ -z "$1" ]
+then
+    echo "$me - set permissions on subtree. v.0.2, ShVV, fbmse.ru, 2017"
+    echo "Usage:"
+    echo "	$me <dir> [R]"
+    echo " Here:"
+    echo "	<dir> - the subtree root directory"
+    echo "	R     - make the whole subtree readonly"
+    exit 1
+fi
+###DEBUG:
+#e=echo
+###
+
+function dflt0()
+{
+    D=$1
+    R=$2
+
+    P=644
+    [ "$R" = "R" ]  && P=444
+
+    Q=755
+    [ "$R" = "R" ]  && Q=555
+
+    find $D -type f -print | while read line
+    do
+	$e chmod $P "$line"
+    done
+    find $D -type d -print | while read line
+    do
+	$e chmod $Q "$line"
+    done
+}
+
+function dflt1()
+{
+    D=$1
+    R=$2
+
+    P=644
+    [ "$R" = "R" ]  && P=444
+
+    Q=755
+    [ "$R" = "R" ]  && Q=555
+
+    find $D -type f -print0 | xargs -0 chmod $P
+    find $D -type d -print0 | xargs -0 chmod $Q
+}
+
+
+
+#dflt0 $1 $2
+ dflt1 $1 $2
+
+#EoF

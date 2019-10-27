@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# Copy all the root fs using GNU tar
+#
+# ShVV 2015-03-28 --
+#
+
+me=`basename $0`
+
+if [ -z "$1" ]
+then
+	echo Usage:
+	echo "	$me <mounted-target-fs> [<start-from>]"
+	exit 1
+fi
+
+S=/
+T="$1"
+
+[ "$2" ]  &&  S="$2"
+
+tar c --one-file-system -C $S . | tar x -C $T
+
+# EoF

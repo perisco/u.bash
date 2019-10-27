@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+# See what's yet to do using a TODO list.
+#
+# ShVV 2015-04-17
+# ShVV 2017-02-02 -- added old ones
+#
+
+# Note: TODO list markup is like follows:
+# YYYY.MM.DD - record date
+# ++ - done
+# +- - partly done
+# -- - not done yet
+# == - comments (not to do)
+#    == - any details
+#	/.../ - any other stuff
+
+# Example:
+# 2020.02.20
+# ++ fill up the todo list
+# -- explain the need for commencts in it
+#    == have an explanation example
+
+D=~/me/w
+TODO=$D/TODO.txt
+
+[ "$1" = "-o" ]  && TODO=`ls $D/TODO.20??.txt`
+
+cat $TODO | grep -v -e '^$' -e '^[[:space:]]' -e '^[+=]' | less -S
+
+# EoF

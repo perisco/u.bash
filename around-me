@@ -1,0 +1,87 @@
+#!/bin/bash
+#
+# who's around me
+# v.0.1
+#
+# ShVV 2019-09-02
+#
+
+if [ ${BASH_VERSINFO[0]} -lt 4 ]
+then
+	echo Sorry this works starting from bash v.4+
+	exit 222
+fi
+
+declare -A vendors=( \
+	["18:0c:ac:"]="Canon-pr"  \
+	["f4:81:39:"]="Canon-pr"  \
+	["f8:0d:60:"]="Canon-pr"  \
+	["00:50:56:"]="VMWare-VM" \
+	["00:0c:29:"]="VMWare-VM" \
+	["52:54:00:"]="KVM-VM"    \
+	["48:5b:39:"]="ASUS-box"  \
+	["b8:af:67:"]="HP-device" \
+	["00:08:9b:"]="ICP-NAS"   \
+	["00:1e:0b:"]="HP-box"    \
+	["d8:e0:e1:"]="(d8:e0:e1)"   \
+\
+	["7c:8b:ca:"]="TPLINK-rt" \
+	["d4:85:64:"]="HP-box"    \
+	["00:60:e0:"]="AXIOM-box" \
+	["60:a4:4c:"]="ASUS-box"  \
+	["00:24:1d:"]="Giga-byte" \
+	["f4:6d:04:"]="ASUS-box"  \
+\
+	["08:00:37:"]="XEROX-Prn" \
+	["2c:59:e5:"]="HP-box"    \
+	["f4:6d:04:"]="ASUS-box"  \
+	["00:1a:4d:"]="Giga-byte" \
+\
+	["90:e6:ba:"]="ASUS-box"  \
+\
+	["00:08:dc:"]="Wiznet"    \
+	["00:0a:48:"]="Albatron"  \
+	["00:1f:d0:"]="Giga-byte" \
+	["50:46:5d:"]="ASUS-box"  \
+	["bc:ae:c5:"]="ASUS-box"  \
+	["1c:b7:2c:"]="ASUS-box"  \
+	["d0:50:99:"]="ASRock"    \
+	["c8:cb:b8:"]="HP-box"    \
+	["20:cf:30:"]="HP-box"    \
+\
+	["00:bb:c1:"]="Canon-?"   \
+	["0c:9d:92:"]="Asus-?"    \
+	["00:04:96:"]="Extreme"   \
+)
+
+### 
+#~ echo total vendors: ${#vendors[@]}
+###
+
+function mac2vendor() {
+	if [ "$1" = "<incomplete>" ]
+	then
+		v=$1
+		venno=........
+		ee="[.....]"
+	else
+		venid=`echo $1 | cut -c1-9`
+		venno=`echo $1 | cut -c10-`
+		v=${vendors[$venid]}
+		[ "$v" ] || v=$venid
+		ee=""
+	fi
+	echo $v $venno $ee
+}
+
+function arp_neighbours () {
+	LANG=C arp -a | while read name ip _at_ mac rest
+	do
+		[ "$1" = "-n" ]  ||  mac=`mac2vendor $mac`
+		echo "$name $ip $mac $rest"
+	done
+}
+
+arp_neighbours $* | column -t
+
+#EoF

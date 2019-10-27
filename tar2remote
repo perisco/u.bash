@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# tar the whole system to a remote computer
+# ShVV 26.03.2015
+
+me=`basename $0`
+
+user=bkup
+host=bkup
+
+S=/
+T=`hostname`-`date +%y%m%d-%H%M`.tgz
+CONNECT=$user@$host
+
+if [ "$1" = "-h" ]
+then
+	echo "$me - tar all (or part of) the system, v.0.8, ShVV 2015"
+	echo "Usage:"
+	echo "	$me [<connect>] [<src-dir>] [<target-file>]"
+	echo "Defaults:"
+	echo "	$me $CONNECT $S $T"
+	exit 1
+fi
+
+[ "$1" ]  && CONNECT=$1
+[ "$2" ]  &&       S=$2
+[ "$3" ]  &&       T=$3
+[ "$4" ]  &&  DEBUG=yes
+
+### DEBUG:
+[ "$DEBUG" ] && e=echo
+###
+
+#tar -cvpzf backup.tar.gz --exclude=/backup.tar.gz --one-file-system / 
+
+if [ "$DEBUG" ] 
+then
+	$e tar -cpz --one-file-system $S \|
+fi
+$e tar -cpz --one-file-system $S | $e ssh $CONNECT "cat > $T"
+
+# EoF

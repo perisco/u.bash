@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#DB=~/.local/share/myip
+#DB=~/.config/myip
+DB=~/.cache/myip
+IP=`host myip.opendns.com resolver1.opendns.com | grep "myip.*has " | cut -f 4 -d' '`
+
+if [ "$1" = "-c" ]
+then
+    rm -rf $DB
+    exit 0
+fi
+
+[ -d $DB        ]  ||  mkdir -p -m 700 $DB
+[ -f $DB/ip.old ]  ||  touch $DB/ip.old
+
+echo $IP > $DB/ip.new
+diff $DB/ip.old $DB/ip.new || cp $DB/ip.new $DB/ip.old
+
+# EoF

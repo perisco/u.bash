@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# move a command(s) or script(s) to ~/bin
+#
+# ShVV 2019-10-22
+
+D=~/bin/
+
+for f in $*
+do
+	install -C -m 555 $f $D
+done
+
+#EoF

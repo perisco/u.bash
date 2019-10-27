@@ -1,0 +1,112 @@
+#!/bin/bash
+#
+# See if an url is alive
+#
+
+# $1 - test url
+# $2 - text to be present
+
+function wget-error() {
+	[ $1 -gt 0 ]  && echo -n " - wget error: "
+	case $1 in
+		0)
+			echo No problems occurred.
+			;;
+		1)
+			echo Generic error code.
+			;;
+		2)
+			echo Parse error
+			;;
+		3)
+			echo File I/O error.
+			;;
+		4)
+			echo Network failure.
+			;;
+		5)
+			echo SSL verification failure.
+			;;
+		6)
+			echo Username/password authentication failure.
+			;;
+		7)
+			echo Protocol errors.
+			;;
+		8)
+			echo Server issued an error response.
+			;;
+		*)
+			echo ???
+			;;
+	esac
+}
+
+function dump-file() {
+	echo --- $1 --------
+	iconv -f cp1251 $1
+	echo -------------------
+}
+
+
+me=`basename $0`
+
+url=$1
+txt=$2
+[ "$3" ]  && user=$3
+[ "$4" ]  && pswd=$4
+
+[ "$5" = "DEBUG" ]  && debug=yes
+[ "$3" = "DEBUG" ]  && debug=yes
+[ "$2" = "DEBUG" ]  && debug=yes
+
+if [ -z "$url" ]
+then
+	echo "Usage:"
+	echo "	$me <url> [<test-text>] [ <user> <password> ] [DEBUG]"
+	exit 1
+fi
+
+
+tmp=/tmp/$me.tmp
+
+[ "$user" ] && login="--user=$user --password=$pswd"
+vrbs=-v
+vrbs=-q
+o="$vrbs $login"
+
+wget $o -O $tmp  $url
+rz=$?
+
+if [ $rz -gt 0 ]
+then
+	echo Checking $url:
+	wget-error $rz
+	exit 16
+fi
+
+####DEBUG:
+#~ echo -------------------------------
+ #~ cat $tmp
+#~ echo -------------------------------
+####
+
+if [ "$txt" ]
+then
+
+	grep -q "$txt"  $tmp
+	rz=$?
+	
+	[ $rz -gt 0 ]  && echo "Checking $url:"
+	[ $rz -gt 0 ]  && echo " - grep result: $rz"
+	[ $rz -eq 1 ]  && echo " - Text not found: $txt"
+	if [ $rz -gt 0 ]
+	then
+		[ "$debug" ]  && [ -f $tmp ]  && dump-file $tmp
+		exit 8
+	fi
+fi
+
+rm   $tmp
+echo "Url $url is OK."
+#EoF
