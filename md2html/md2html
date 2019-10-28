@@ -1,0 +1,105 @@
+#!/bin/sh
+#
+# Make a well-formed html from markdown.
+#
+# ShVV 2016-12-07
+#
+
+get_header()
+{
+	local H=$1
+
+	[ -f $H ] && return 0
+	
+	if [ -f $H ]
+	then
+		return 0
+	fi
+	
+	cat > $H <<EOF
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+
+<style>
+article {
+	width    : 96%;
+	max-width : 195mm;
+/*
+	max-height: 100%;
+ */
+	margin   : auto;
+	padding  : 2%;
+	background-color: White;
+	box-shadow: 0.5em 0.75em 1em 0 Black,  -0.062em -0.093em 0.5em 0 Black ;
+}
+body {
+	background-color: Silver;
+}
+
+@media print {
+
+article {
+	width    : 96%;
+	margin   : auto;
+	padding  : 2%;
+	background-color: White;
+	box-shadow: none;
+}
+body {
+	background-color: White;
+}
+
+}
+
+</style>
+</head>
+<body>
+<article>
+
+EOF
+}
+
+get_footer()
+{
+	local H=$1
+	if [ -f $H ]
+	then
+		return 0
+	fi
+	
+	cat > $H <<EOF
+
+</article>
+</body>
+</html>
+EOF
+}
+
+get_header_footer()
+{
+	[ -d $1 ] || mkdir -p $1
+	get_header $2
+	get_footer $3
+}
+
+T=~/tmp
+H=$T/0-head.html
+F=$T/1-foot.html
+
+if [ "$1" = "-c" ]
+then
+    shift
+    rm -f $H $F
+fi
+
+get_header_footer $T $H $F
+
+### DEBUG:
+#echo H=$H
+#echo F=$F
+###
+
+(cat $H; markdown $1 ; cat $F)
+
+# EoF
